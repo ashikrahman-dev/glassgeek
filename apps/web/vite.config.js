@@ -5,7 +5,6 @@ import inlineEditPlugin from './plugins/visual-editor/vite-plugin-react-inline-e
 import editModeDevPlugin from './plugins/visual-editor/vite-plugin-edit-mode.js';
 import iframeRouteRestorationPlugin from './plugins/vite-plugin-iframe-route-restoration.js';
 import sitePagesPlugin from './plugins/vite-plugin-site-pages.js';
-import pocketbaseAuthPlugin from './plugins/vite-plugin-pocketbase-auth.js';
 import sessionJournalPlugin from './plugins/session-journal/vite-plugin-session-journal.js';
 import ecommerceTrackingPlugin from './plugins/ecommerce-tracking/vite-plugin-ecommerce-tracking.js';
 
@@ -407,7 +406,7 @@ logger.error = (msg, options) => {
 export default defineConfig({
 	customLogger: logger,
 	plugins: [
-		...(isDev ? [inlineEditPlugin(), editModeDevPlugin(), iframeRouteRestorationPlugin(), sitePagesPlugin(), pocketbaseAuthPlugin(), sessionJournalPlugin()] : []),
+		...(isDev ? [inlineEditPlugin(), editModeDevPlugin(), iframeRouteRestorationPlugin(), sitePagesPlugin(),sessionJournalPlugin()] : []),
 		react(),
 		addTransformIndexHtml,
 		domainCheckoutDevPlugin,
@@ -423,12 +422,11 @@ export default defineConfig({
 			'.app-preview.com',
 			'.app-preview.io',
 		],
-		// Hostinger proxies /hcgi/platform to PocketBase; mirror that for local dev.
+		// The quote API runs in apps/server; forward to it during dev.
 		proxy: {
-			'/hcgi/platform': {
-				target: 'http://127.0.0.1:8090',
+			'/api': {
+				target: 'http://127.0.0.1:3001',
 				changeOrigin: true,
-				rewrite: (p) => p.replace(/^\/hcgi\/platform/, ''),
 			},
 		},
 		fs: {

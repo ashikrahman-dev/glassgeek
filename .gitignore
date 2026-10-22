@@ -2,5 +2,7 @@ node_modules/
 dist/
 apps/pocketbase/pb_data/
 vault/
-.env*
+data/
+.env
+.env.local
 *.log

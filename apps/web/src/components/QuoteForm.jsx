@@ -7,7 +7,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import pb from '@/lib/pocketbaseClient';
 function QuoteForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const {
@@ -19,12 +18,22 @@ function QuoteForm() {
     reset,
     setValue
   } = useForm();
+  register('serviceType', {
+    required: 'Please select a service'
+  });
   const onSubmit = async data => {
     setIsSubmitting(true);
     try {
-      await pb.collection('quotes').create(data, {
-        $autoCancel: false
+      const response = await fetch('/api/quotes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
       });
+      if (!response.ok) {
+        throw new Error(`Quote request failed with status ${response.status}`);
+      }
       toast.success('Quote request submitted successfully');
       reset();
     } catch (error) {
@@ -36,6 +45,8 @@ function QuoteForm() {
   };
   const inputClasses = "mt-2 bg-background border-border focus:border-secondary focus:ring-secondary/20 text-foreground transition-all duration-200 rounded-lg";
   return <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+      {/* Honeypot for spam bots; hidden from real visitors. */}
+      <input type="text" className="hidden" tabIndex={-1} autoComplete="off" aria-hidden="true" {...register('website')} />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <div>
           <Label htmlFor="fullName" className="text-primary font-bold">Full Name</Label>
@@ -68,7 +79,9 @@ function QuoteForm() {
 
       <div>
         <Label htmlFor="serviceType" className="text-primary font-bold">Service Type</Label>
-        <Select onValueChange={value => setValue('serviceType', value)}>
+        <Select onValueChange={value => setValue('serviceType', value, {
+        shouldValidate: true
+      })}>
           <SelectTrigger className={inputClasses}>
             <SelectValue placeholder="Select a service" />
           </SelectTrigger>

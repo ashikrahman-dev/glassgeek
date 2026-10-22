@@ -1,0 +1,14 @@
+{
+  "name": "server",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "node --watch index.js",
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^5.3.0",
+    "nodemailer": "^10.2.0"
+  }
+}
